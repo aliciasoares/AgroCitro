@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Total Plantado</title>
+  <link rel="stylesheet" href="./css/header.css">
+  <link rel="stylesheet" href="./css/estilo.css">
+</head>
+<body>
+
+  <div id="topo"> 
+    <img src="./img/logocomnome.png" alt="Logo" id="logotopo">
+  </div>
+  <div class="menu">
+    <a href="index.html">Página Inicial</a>
+    <a href="historia.html">História</a>
+    <a href="plantio.html">Registro de Plantio</a>
+    <a href="colheita.html">Registro de Colheita</a>
+    <a href="agendamento.html">Agendamento de Irrigação</a>
+    <a href="total-plantado.html">Total Plantado</a> 
+  </div>
+
+  <header>
+    <h1>Total de Mudas Plantadas</h1>
+    <p>Visualização da quantidade total de mudas (em kg) registradas no sistema.</p>
+  </header>
+
+  <main>
+    <section id="total-plantado">
+      <h2>Soma Total</h2>
+      <p>O total de mudas plantadas (em kg) até o momento é:</p>
+      <span id="total-mudas">Carregando...</span>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="ano-atual"></span> Sistema de Registro Agrícola</p>
+  </footer>
+
+  <script>
+    document.getElementById('ano-atual').textContent = new Date().getFullYear();
+
+    async function carregarTotalPlantado() {
+      const totalElement = document.getElementById('total-mudas');
+      
+      try {
+        const resposta = await fetch('http://10.111.9.75:3000/plantio'); 
+        
+        if (!resposta.ok) {
+          throw new Error('Erro ao carregar os dados do servidor');
+        }
+
+        const plantios = await resposta.json();
+
+        const total = plantios.reduce((soma, plantio) => {
+          return soma + parseFloat(plantio.Quantidade_Plantada); 
+        }, 0);
+
+        totalElement.textContent = total.toFixed(2) + ' kg';
+
+      } catch (error) {
+        console.error("Erro ao obter o total plantado:", error);
+        totalElement.textContent = 'Erro ao carregar dados.';
+      }
+    }
+
+    carregarTotalPlantado();
+  </script>
+ 
+</body>
+</html>

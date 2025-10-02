@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamento de Irrigação</title>
+  <link rel="stylesheet" href="./css/header.css">
+  <link rel="stylesheet" href="./css/estilo.css">
+</head>
+<body>
+
+  <div id="topo"> 
+    <img src="./img/logocomnome.png" alt="Logo" id="logotopo">
+  </div>
+  <div class="menu">
+    <a href="index.html">Página Inicial</a>
+    <a href="historia.html">História</a>
+    <a href="plantio.html">Registro de Plantio</a>
+    <a href="colheita.html">Registro de Colheita</a>
+    <a href="agendamento.html">Agendamento de Irrigação</a>
+  </div>
+
+  <header>
+    <h1>Agendamento de Irrigação</h1>
+    <p>Os agricultores podem agendar irrigações automáticas com base em dados de monitoramento do solo e previsões meteorológicas, garantindo o fornecimento adequado de água às laranjeiras.</p>
+  </header>
+
+  <main>
+    <section id="agendamento-irrigacao">
+      <h2>Agende sua Irrigação</h2>
+      <form id="form-agendamento">
+        <label for="data-irrigacao">Data da Irrigação:</label>
+        <input type="date" id="data-irrigacao" required>
+
+        <label for="hora-irrigacao">Hora da Irrigação:</label>
+        <input type="time" id="hora-irrigacao" required>
+
+        <label for="quantidade-agua">Quantidade de Água (litros):</label>
+        <input type="number" id="quantidade-agua" min="1" required>
+
+        <label for="previsao-meteorologica">Previsão Meteorológica:</label>
+        <select id="previsao-meteorologica" required>
+          <option value="">Selecione</option>
+          <option value="chuvas">Chuvas</option>
+          <option value="ensolarado">Ensolarado</option>
+          <option value="nublado">Nublado</option>
+        </select>
+
+        <button type="submit">Agendar Irrigação</button>
+      </form>
+    </section>
+
+    <section id="lista-agendamentos">
+      <h2>Agendamentos Realizados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Hora</th>
+            <th>Quantidade de Água (litros)</th>
+            <th>Previsão Meteorológica</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-agendamentos"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="ano-atual"></span> Sistema de Agendamento de Irrigação</p>
+  </footer>
+
+  <script>
+    document.getElementById('ano-atual').textContent = new Date().getFullYear();
+
+    const form = document.getElementById('form-agendamento');
+    const tabela = document.getElementById('tabela-agendamentos');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const data = document.getElementById('data-irrigacao').value;
+      const hora = document.getElementById('hora-irrigacao').value;
+      const quantidade = document.getElementById('quantidade-agua').value;
+      const previsao = document.getElementById('previsao-meteorologica').value;
+
+      if (data && hora && quantidade && previsao) {
+        const novaLinha = document.createElement('tr');
+        novaLinha.innerHTML = `
+          <td>${data}</td>
+          <td>${hora}</td>
+          <td>${quantidade} litros</td>
+          <td>${previsao}</td>
+        `;
+        tabela.appendChild(novaLinha);
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>

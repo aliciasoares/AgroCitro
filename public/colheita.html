@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Colheita</title>
+  <link rel="stylesheet" href="./css/header.css">
+  <link rel="stylesheet" href="./css/estilo.css">
+</head>
+<body>
+
+  <div id="topo"> 
+    <img src="./img/logocomnome.png" alt="Logo" id="logotopo">
+  </div>
+  
+  <div class="menu">
+    <a href="index.html">Página Inicial</a>
+    <a href="historia.html">História</a>
+    <a href="plantio.html">Registro de Plantio</a>
+    <a href="colheita.html">Registro de Colheita</a>
+    <a href="agendamento.html">Agendamento de Irrigação</a>
+  </div>
+
+  <header>
+    <h1>Registro de Colheita</h1>
+    <p>Preencha as informações abaixo para registrar sua colheita</p>
+  </header>
+
+  <main>
+    <section id="registro-colheita">
+      <h2>Formulário de Registro de Colheita</h2>
+      <form id="form-colheita">
+        <label for="plantio-id">ID do Plantio Relacionado:</label>
+        <input type="number" id="plantio-id" min="1" required>
+        
+        <label for="data-colheita">Data da Colheita:</label>
+        <input type="date" id="data-colheita" required>
+
+        <label for="quantidade-colheita">Quantidade Colhida (kg):</label>
+        <input type="number" id="quantidade-colheita" min="1" required>
+
+        <label for="qualidade">Qualidade (Ex: Excelente, Boa, Média, Ruim):</label>
+        <input type="text" id="qualidade" required>
+
+        <button type="submit">Registrar Colheita</button>
+      </form>
+    </section>
+
+    <section id="lista-colheita">
+      <h2>Colheitas Registradas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID Plantio</th>
+            <th>Data da Colheita</th>
+            <th>Quantidade (kg)</th>
+            <th>Qualidade</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-colheita"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="ano-atual"></span> Sistema de Registro Agrícola</p>
+  </footer>
+
+  <script>
+    document.getElementById('ano-atual').textContent = new Date().getFullYear();
+
+    const form = document.getElementById('form-colheita');
+    const tabela = document.getElementById('tabela-colheita');
+    const urlPost = 'http://10.111.9.75:3000/postcolheitas'; 
+    const urlGet  = 'http://10.111.9.75:3000/colheitas'; 
+
+    async function carregarColheitas() {
+      try {
+        const resposta = await fetch(urlGet);
+        const colheitas = await resposta.json();
+
+        tabela.innerHTML = ""; 
+
+        colheitas.forEach(c => {
+          const linha = document.createElement('tr');
+          linha.innerHTML = `
+            <td>${c.Plantio_IdPlantio}</td>
+            <td>${c.Data_colheita}</td>
+            <td>${c.Quantidade_colhida}</td>
+            <td>${c.Qualidade}</td>
+          `;
+          tabela.appendChild(linha);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar colheitas:", error);
+      }
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const Plantio_IdPlantio = document.getElementById('plantio-id').value;
+      const Data_colheita = document.getElementById('data-colheita').value;
+      const Quantidade_colhida = document.getElementById('quantidade-colheita').value; 
+      const Qualidade = document.getElementById('qualidade').value;
+
+      if (Plantio_IdPlantio && Data_colheita && Quantidade_colheida && Qualidade) {
+        try {
+          const resposta = await fetch(urlPost, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              Plantio_IdPlantio,
+              Data_colheita,
+              Quantidade_colhida,
+              Qualidade
+            })
+          });
+
+          const result = await resposta.json();
+          console.log(result);
+          alert(result.msg || "Colheita registrada com sucesso!");
+
+         
+          if (resposta.ok) {
+      
+            const novaLinha = document.createElement('tr');
+            novaLinha.innerHTML = `
+              <td>${Plantio_IdPlantio}</td>
+              <td>${Data_colheita}</td>
+              <td>${Quantidade_colhida}</td>
+              <td>${Qualidade}</td>
+            `;
+            tabela.appendChild(novaLinha);
+
+          
+            form.reset();
+          } else {
+             alert(`Erro do servidor: ${result.msg || resposta.statusText}`);
+          }
+
+        } catch (error) {
+          console.error("Erro ao enviar dados da colheita:", error);
+          alert("Ocorreu um erro ao conectar com o servidor. Verifique a URL.");
+        }
+      } else {
+        alert("Por favor, preencha todos os campos.");
+      }
+    });
+
+    carregarColheitas();
+  </script>
+  
+</body>
+</html>
